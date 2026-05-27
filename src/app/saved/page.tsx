@@ -1,5 +1,5 @@
 import { AppShell } from "@/components/app-shell";
-import { PromptFeed } from "@/components/prompt-feed";
+import { PromptArchiveList } from "@/components/prompt-archive-list";
 import { getSavedPrompts } from "@/lib/queries/prompts";
 
 export default async function SavedPage() {
@@ -10,10 +10,12 @@ export default async function SavedPage() {
       title="Saved prompts"
       description="Your private stack of go-to prompts"
     >
-      <PromptFeed
-        prompts={prompts}
-        emptyMessage="Save prompts to build your personal library."
-      />
+      <div className="pb-10">
+        <PromptArchiveList
+          prompts={prompts}
+          emptyMessage="No prompts saved yet. Start exploring!"
+        />
+      </div>
     </AppShell>
   );
 }

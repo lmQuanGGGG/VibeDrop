@@ -6,6 +6,7 @@ import {
   PlusCircle,
   TrendingUp,
   User,
+  Search
 } from "lucide-react";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 
@@ -35,7 +36,7 @@ export async function CreatorSidebar() {
   const navItems = [
     { href: "/", label: "Home", icon: Home },
     { href: "/trending", label: "Trending", icon: TrendingUp },
-    { href: "/tags/coding", label: "Explore", icon: Compass },
+    { href: "/explore", label: "Explore", icon: Search },
     { href: "/create", label: "Create Prompt", icon: PlusCircle },
     { href: "/saved", label: "Saved", icon: Bookmark },
     { href: profileHref, label: profileLabel, icon: User },

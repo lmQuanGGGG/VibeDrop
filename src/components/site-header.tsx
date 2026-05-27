@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { Search } from "lucide-react";
+import { LogoutButton } from "@/components/logout-button";
 
 export async function SiteHeader() {
   const supabase = await createServerSupabaseClient();
@@ -26,7 +27,7 @@ export async function SiteHeader() {
     >
       {/* Search Input Container */}
       <div className="flex items-center gap-3 flex-grow max-w-lg" id="header-search-group">
-        <form action="/" method="get" className="relative w-full">
+        <form action="/explore" method="get" className="relative w-full">
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-black pointer-events-none" />
           <input
             name="q"
@@ -47,20 +48,23 @@ export async function SiteHeader() {
             Sign In
           </Link>
         ) : (
-          <Link
-            href={`/profile/${profile?.username}`}
-            className="flex items-center gap-2 bg-white hover:bg-neutral-50 border-2 border-black py-1.5 pl-2 pr-3 max-sm:pr-2 rounded-none cursor-pointer transition-all active:translate-y-0.5 text-left shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"
-          >
-            <img
-              src={profile?.avatar_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${displayName}`}
-              alt={displayName}
-              referrerPolicy="no-referrer"
-              className="w-7 h-7 rounded-none border border-black flex-shrink-0 bg-neutral-100 object-cover"
-            />
-            <span className="font-display font-black text-[10px] tracking-wider uppercase text-black max-sm:hidden select-none">
-              {displayName}
-            </span>
-          </Link>
+          <div className="flex items-center gap-2">
+            <Link
+              href={`/profile/${profile?.username}`}
+              className="flex items-center gap-2 bg-white hover:bg-neutral-50 border-2 border-black py-1.5 pl-2 pr-3 max-sm:pr-2 rounded-none cursor-pointer transition-all active:translate-y-0.5 text-left shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"
+            >
+              <img
+                src={profile?.avatar_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${displayName}`}
+                alt={displayName}
+                referrerPolicy="no-referrer"
+                className="w-7 h-7 rounded-none border border-black flex-shrink-0 bg-neutral-100 object-cover"
+              />
+              <span className="font-display font-black text-[10px] tracking-wider uppercase text-black max-sm:hidden select-none">
+                {displayName}
+              </span>
+            </Link>
+            <LogoutButton />
+          </div>
         )}
       </div>
     </header>

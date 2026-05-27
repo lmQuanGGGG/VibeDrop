@@ -23,7 +23,7 @@ export function AppShell({
       {showSidebar && <CreatorSidebar />}
 
       {/* Center / Primary body columns */}
-      <div className={`flex-grow ${showSidebar ? "pl-64 max-lg:pl-0" : ""} pr-80 max-xl:pr-0 flex flex-col`} id="middle-content-area">
+      <div className={`flex-grow ${showSidebar ? "pl-64 max-lg:pl-0" : ""} pr-80 max-xl:pr-0 flex flex-col h-screen overflow-y-auto custom-scrollbar`} id="middle-content-area">
         <SiteHeader />
         
         {/* Page contents panel */}

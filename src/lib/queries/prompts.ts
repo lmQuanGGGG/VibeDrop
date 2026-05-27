@@ -26,6 +26,7 @@ export type PromptRecord = {
   created_at: string;
   updated_at: string;
   image_url: string | null;
+  thumbnail_url?: string | null;
   profiles: PromptProfile | null;
   votes?: { value: number; user_id: string }[];
   comments?: { id: string }[];
@@ -104,33 +105,42 @@ function normalizePrompt(row: PromptRow): PromptRecord {
   };
 }
 
-export async function getPublicFeed({ query }: { query?: string } = {}) {
+export async function getPublicFeed({ query, page = 1, limit = 20 }: { query?: string, page?: number, limit?: number } = {}) {
   const supabase = await createServerSupabaseClient();
   const { data: auth } = await supabase.auth.getUser();
   const viewerId = auth.user?.id;
 
+  const from = (page - 1) * limit;
+  const to = from + limit - 1;
+
   let request = supabase
     .from("prompts")
     .select(
-      "id, user_id, title, prompt_text, result_text, category, tags, remix_of, copy_count, save_count, view_count, status, created_at, updated_at, image_url, profiles!prompts_user_id_fkey(id, username, display_name, avatar_url), votes(value, user_id), comments(id), saved_prompts(user_id)"
+      "id, user_id, title, prompt_text, result_text, category, tags, remix_of, copy_count, save_count, view_count, status, created_at, updated_at, image_url, thumbnail_url, profiles!prompts_user_id_fkey(id, username, display_name, avatar_url), votes(value, user_id), comments(id), saved_prompts(user_id)",
+      { count: "exact" }
     )
     .eq("visibility", "public")
     .eq("status", "active")
     .order("created_at", { ascending: false })
-    .limit(40);
+    .range(from, to);
 
   if (query) {
     request = request.or(`title.ilike.%${query}%,prompt_text.ilike.%${query}%,category.ilike.%${query}%`);
   }
 
-  const { data, error } = await request;
+  const { data, count, error } = await request;
 
   if (error || !data) {
-    return [] as PromptWithStats[];
+    return { prompts: [], totalPages: 0 };
   }
 
   const normalized = (data as PromptRow[]).map(normalizePrompt);
-  return enrichPrompts(normalized, viewerId);
+  const totalPages = count ? Math.ceil(count / limit) : 0;
+  
+  return {
+    prompts: enrichPrompts(normalized, viewerId),
+    totalPages
+  };
 }
 
 export async function getPromptById(promptId: string) {
@@ -141,7 +151,7 @@ export async function getPromptById(promptId: string) {
   const { data, error } = await supabase
     .from("prompts")
     .select(
-      "id, user_id, title, prompt_text, result_text, category, tags, remix_of, copy_count, save_count, view_count, status, created_at, updated_at, image_url, profiles!prompts_user_id_fkey(id, username, display_name, avatar_url), votes(value, user_id), comments(id), saved_prompts(user_id)"
+      "id, user_id, title, prompt_text, result_text, category, tags, remix_of, copy_count, save_count, view_count, status, created_at, updated_at, image_url, thumbnail_url, profiles!prompts_user_id_fkey(id, username, display_name, avatar_url), votes(value, user_id), comments(id), saved_prompts(user_id)"
     )
     .eq("id", promptId)
     .single();
@@ -170,7 +180,7 @@ export async function getPromptsByTag(tag: string) {
   const { data, error } = await supabase
     .from("prompts")
     .select(
-      "id, user_id, title, prompt_text, result_text, category, tags, remix_of, copy_count, save_count, view_count, status, created_at, updated_at, image_url, profiles!prompts_user_id_fkey(id, username, display_name, avatar_url), votes(value, user_id), comments(id), saved_prompts(user_id)"
+      "id, user_id, title, prompt_text, result_text, category, tags, remix_of, copy_count, save_count, view_count, status, created_at, updated_at, image_url, thumbnail_url, profiles!prompts_user_id_fkey(id, username, display_name, avatar_url), votes(value, user_id), comments(id), saved_prompts(user_id)"
     )
     .contains("tags", [tag])
     .eq("visibility", "public")
@@ -186,12 +196,22 @@ export async function getPromptsByTag(tag: string) {
   return enrichPrompts(normalized, viewerId);
 }
 
-export async function getTrendingPrompts() {
-  const prompts = await getPublicFeed();
-  return prompts
+export async function getTrendingPrompts(page = 1, limit = 20) {
+  // Fetch up to 200 recent prompts to calculate trending
+  const { prompts } = await getPublicFeed({ limit: 200 });
+  
+  const sortedPrompts = prompts
     .slice()
-    .sort((left, right) => right.trendingScore - left.trendingScore)
-    .slice(0, 30);
+    .sort((left, right) => right.trendingScore - left.trendingScore);
+    
+  const totalPages = Math.ceil(sortedPrompts.length / limit);
+  const startIndex = (page - 1) * limit;
+  const endIndex = startIndex + limit;
+  
+  return {
+    prompts: sortedPrompts.slice(startIndex, endIndex),
+    totalPages
+  };
 }
 
 export async function getSavedPrompts() {
@@ -206,7 +226,7 @@ export async function getSavedPrompts() {
   const { data, error } = await supabase
     .from("saved_prompts")
     .select(
-      "prompt_id, prompts(id, user_id, title, prompt_text, result_text, category, tags, remix_of, copy_count, save_count, view_count, status, created_at, updated_at, image_url, profiles!prompts_user_id_fkey(id, username, display_name, avatar_url), votes(value, user_id), comments(id), saved_prompts(user_id))"
+      "prompt_id, prompts(id, user_id, title, prompt_text, result_text, category, tags, remix_of, copy_count, save_count, view_count, status, created_at, updated_at, image_url, thumbnail_url, profiles!prompts_user_id_fkey(id, username, display_name, avatar_url), votes(value, user_id), comments(id), saved_prompts(user_id))"
     )
     .eq("user_id", viewerId)
     .order("created_at", { ascending: false });
@@ -231,7 +251,7 @@ export async function getPromptsByUserId(userId: string) {
   const { data, error } = await supabase
     .from("prompts")
     .select(
-      "id, user_id, title, prompt_text, result_text, category, tags, remix_of, copy_count, save_count, view_count, status, created_at, updated_at, image_url, profiles!prompts_user_id_fkey(id, username, display_name, avatar_url), votes(value, user_id), comments(id), saved_prompts(user_id)"
+      "id, user_id, title, prompt_text, result_text, category, tags, remix_of, copy_count, save_count, view_count, status, created_at, updated_at, image_url, thumbnail_url, profiles!prompts_user_id_fkey(id, username, display_name, avatar_url), votes(value, user_id), comments(id), saved_prompts(user_id)"
     )
     .eq("user_id", userId)
     .eq("status", "active")
@@ -243,4 +263,64 @@ export async function getPromptsByUserId(userId: string) {
 
   const normalized = (data as PromptRow[]).map(normalizePrompt);
   return enrichPrompts(normalized, viewerId);
+}
+
+export async function getPromptsByCategory(category: string, limit = 6) {
+  const supabase = await createServerSupabaseClient();
+  const { data: auth } = await supabase.auth.getUser();
+  const viewerId = auth.user?.id;
+
+  const { data, error } = await supabase
+    .from("prompts")
+    .select(
+      "id, user_id, title, prompt_text, result_text, category, tags, remix_of, copy_count, save_count, view_count, status, created_at, updated_at, image_url, thumbnail_url, profiles!prompts_user_id_fkey(id, username, display_name, avatar_url), votes(value, user_id), comments(id), saved_prompts(user_id)"
+    )
+    .ilike("category", category)
+    .eq("visibility", "public")
+    .eq("status", "active")
+    .order("created_at", { ascending: false })
+    .limit(limit);
+
+  if (error || !data) {
+    return [] as PromptWithStats[];
+  }
+
+  const normalized = (data as PromptRow[]).map(normalizePrompt);
+  return enrichPrompts(normalized, viewerId);
+}
+
+export async function getPopularTags(limit = 10): Promise<string[]> {
+  const supabase = await createServerSupabaseClient();
+  
+  // Fetch tags from recent active public prompts
+  const { data, error } = await supabase
+    .from("prompts")
+    .select("tags")
+    .eq("visibility", "public")
+    .eq("status", "active")
+    .order("created_at", { ascending: false })
+    .limit(100);
+
+  if (error || !data) {
+    return [];
+  }
+
+  const tagCounts: Record<string, number> = {};
+  data.forEach((row) => {
+    if (row.tags && Array.isArray(row.tags)) {
+      row.tags.forEach((tag) => {
+        let t = tag.trim().toLowerCase();
+        if (t.startsWith("#")) t = t.slice(1);
+        if (t) {
+          tagCounts[t] = (tagCounts[t] || 0) + 1;
+        }
+      });
+    }
+  });
+
+  // Sort by count descending and return top 'limit' tags
+  return Object.entries(tagCounts)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, limit)
+    .map(([tag]) => tag);
 }

@@ -13,10 +13,15 @@ export async function createPrompt(formData: FormData) {
     .get("tags")
     ?.toString()
     .split(",")
-    .map((tag) => tag.trim())
+    .map((tag) => {
+      let t = tag.trim();
+      if (t.startsWith("#")) t = t.slice(1);
+      return t;
+    })
     .filter(Boolean);
   const remixOf = formData.get("remixOf")?.toString() ?? null;
-  const previewFile = formData.get("preview") as File | null;
+  const thumbnailUrl = formData.get("thumbnailUrl")?.toString() || null;
+  const thumbnailKey = formData.get("thumbnailKey")?.toString() || null;
 
   if (!title || !promptText || !category) {
     return;
@@ -29,28 +34,6 @@ export async function createPrompt(formData: FormData) {
     redirect("/login");
   }
 
-  let imageUrl: string | null = null;
-  
-  if (previewFile && previewFile.size > 0) {
-    // Generate unique filename
-    const fileExt = previewFile.name.split('.').pop();
-    const fileName = `${auth.user.id}-${Date.now()}.${fileExt}`;
-    
-    const { data: uploadData, error: uploadError } = await supabase
-      .storage
-      .from('prompts')
-      .upload(fileName, previewFile);
-      
-    if (!uploadError && uploadData) {
-      const { data: publicUrlData } = supabase
-        .storage
-        .from('prompts')
-        .getPublicUrl(uploadData.path);
-        
-      imageUrl = publicUrlData.publicUrl;
-    }
-  }
-
   const { data, error } = await supabase
     .from("prompts")
     .insert({
@@ -61,14 +44,16 @@ export async function createPrompt(formData: FormData) {
       tags: tags ?? [],
       user_id: auth.user.id,
       remix_of: remixOf || null,
-      image_url: imageUrl,
+      thumbnail_url: thumbnailUrl,
+      thumbnail_key: thumbnailKey,
+      image_url: thumbnailUrl, // Fallback for existing UI
     })
     .select("id")
     .single();
 
   if (error || !data) {
     console.error("createPrompt error:", error);
-    return;
+    throw new Error(error?.message || "Failed to save prompt to database");
   }
 
   revalidatePath("/");
@@ -84,9 +69,16 @@ export async function updatePrompt(promptId: string, formData: FormData) {
     .get("tags")
     ?.toString()
     .split(",")
-    .map((tag) => tag.trim())
+    .map((tag) => {
+      let t = tag.trim();
+      if (t.startsWith("#")) t = t.slice(1);
+      return t;
+    })
     .filter(Boolean);
-  const previewFile = formData.get("preview") as File | null;
+  
+  // These will be present if a new image was uploaded to R2
+  const thumbnailUrl = formData.get("thumbnailUrl")?.toString() || null;
+  const thumbnailKey = formData.get("thumbnailKey")?.toString() || null;
 
   if (!title || !promptText || !category) {
     return;
@@ -102,7 +94,7 @@ export async function updatePrompt(promptId: string, formData: FormData) {
   // Ensure the user owns the prompt before updating
   const { data: existingPrompt } = await supabase
     .from("prompts")
-    .select("user_id, image_url")
+    .select("user_id, image_url, thumbnail_url, thumbnail_key")
     .eq("id", promptId)
     .single();
 
@@ -110,26 +102,9 @@ export async function updatePrompt(promptId: string, formData: FormData) {
     return;
   }
 
-  let imageUrl: string | null = existingPrompt.image_url;
-  
-  if (previewFile && previewFile.size > 0) {
-    const fileExt = previewFile.name.split('.').pop();
-    const fileName = `${auth.user.id}-${Date.now()}.${fileExt}`;
-    
-    const { data: uploadData, error: uploadError } = await supabase
-      .storage
-      .from('prompts')
-      .upload(fileName, previewFile);
-      
-    if (!uploadError && uploadData) {
-      const { data: publicUrlData } = supabase
-        .storage
-        .from('prompts')
-        .getPublicUrl(uploadData.path);
-        
-      imageUrl = publicUrlData.publicUrl;
-    }
-  }
+  const newImageUrl = thumbnailUrl || existingPrompt.image_url;
+  const newThumbnailUrl = thumbnailUrl || existingPrompt.thumbnail_url;
+  const newThumbnailKey = thumbnailKey || existingPrompt.thumbnail_key;
 
   const { error } = await supabase
     .from("prompts")
@@ -139,7 +114,9 @@ export async function updatePrompt(promptId: string, formData: FormData) {
       result_text: resultText || null,
       category,
       tags: tags ?? [],
-      image_url: imageUrl,
+      image_url: newImageUrl,
+      thumbnail_url: newThumbnailUrl,
+      thumbnail_key: newThumbnailKey,
       updated_at: new Date().toISOString(),
     })
     .eq("id", promptId);

@@ -29,12 +29,12 @@ export function PromptCard({ prompt }: PromptCardProps) {
 
       {/* Hero Visual Banner Container */}
       <div className="relative h-48 md:h-auto md:w-2/5 md:min-h-[250px] md:border-b-0 md:border-r-2 flex-shrink-0 overflow-hidden border-b-2 border-black animated-bg flex items-center justify-center bg-neutral-100">
-        {prompt.image_url ? (
+        {(prompt.thumbnail_url || prompt.image_url) ? (
           <>
             {/* Blurred background layer */}
-            <img src={prompt.image_url} alt="" className="absolute inset-0 w-full h-full object-cover blur-md opacity-40 scale-110" />
+            <img src={prompt.thumbnail_url || prompt.image_url || undefined} alt="" className="absolute inset-0 w-full h-full object-cover blur-md opacity-40 scale-110" />
             {/* Main uncropped image */}
-            <img src={prompt.image_url} alt={prompt.title} className="absolute inset-0 w-full h-full object-contain z-0 drop-shadow-[4px_4px_0px_rgba(0,0,0,1)] p-2" />
+            <img src={prompt.thumbnail_url || prompt.image_url || undefined} alt={prompt.title} className="absolute inset-0 w-full h-full object-contain z-0 drop-shadow-[4px_4px_0px_rgba(0,0,0,1)] p-2" />
           </>
         ) : (
           <>
@@ -105,8 +105,8 @@ export function PromptCard({ prompt }: PromptCardProps) {
           )}
 
           {/* Engagement counters bar */}
-          <div className="flex items-center justify-between mt-auto pt-4 border-t-2 border-black">
-            <div className="flex items-center gap-4 text-black font-mono text-[10px] font-bold uppercase">
+          <div className="flex items-center justify-between flex-wrap gap-y-3 mt-auto pt-4 border-t-2 border-black">
+            <div className="flex items-center gap-4 text-black font-mono text-[10px] font-bold uppercase flex-shrink-0">
               <VoteButton
                 promptId={prompt.id}
                 initialScore={prompt.voteScore}
@@ -119,18 +119,20 @@ export function PromptCard({ prompt }: PromptCardProps) {
               </Link>
             </div>
 
-            <div className="flex items-center gap-1.5">
+            <div className="flex items-center gap-1.5 flex-shrink-0">
               {prompt.isOwner && (
                 <div className="flex items-center gap-1.5 mr-2 pr-2 border-r-2 border-black">
                   <Link 
                     href={`/prompts/${prompt.id}/edit`}
-                    className="font-mono text-[9px] font-black uppercase text-white bg-black hover:bg-neutral-800 px-2 py-1 border border-black shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] active:translate-y-px transition-all"
+                    className="flex-shrink-0 font-mono text-[9px] font-black uppercase text-white bg-black hover:bg-neutral-800 px-2 py-1.5 border border-black shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] active:translate-y-px transition-all"
                   >
                     Edit
                   </Link>
                 </div>
               )}
-              <CopyButton promptId={prompt.id} promptText={prompt.prompt_text} />
+              <div className="flex-shrink-0">
+                <CopyButton promptId={prompt.id} promptText={prompt.prompt_text} />
+              </div>
             </div>
           </div>
         </div>

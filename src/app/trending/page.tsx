@@ -1,19 +1,17 @@
 import { AppShell } from "@/components/app-shell";
-import { PromptFeed } from "@/components/prompt-feed";
+import { TrendingFeed } from "@/components/trending-feed";
 import { getTrendingPrompts } from "@/lib/queries/prompts";
 
 export default async function TrendingPage() {
-  const prompts = await getTrendingPrompts();
+  // Always fetch just the top 30 for the billboard chart
+  const { prompts } = await getTrendingPrompts(1, 30);
 
   return (
     <AppShell
       title="Trending"
-      description="Prompts climbing the feed right now"
+      description="The definitive top 30 billboard chart"
     >
-      <PromptFeed
-        prompts={prompts}
-        emptyMessage="Nothing trending yet. Be the spark."
-      />
+      <TrendingFeed prompts={prompts} />
     </AppShell>
   );
 }

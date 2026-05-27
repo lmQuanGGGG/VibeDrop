@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { createComment } from "@/lib/actions/comments";
 import { CommentRecord } from "@/lib/queries/comments";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -49,20 +50,24 @@ function CommentItem({ comment, promptId, replyingTo, onReply, depth = 0 }: Comm
     <div className={`mt-4 ${depth > 0 ? 'ml-2 sm:ml-8 pl-4 border-l-4 border-black' : ''}`}>
       <div className="bg-white border-4 border-black p-4 sm:p-5 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] rounded-none">
         <div className="flex items-start gap-3 sm:gap-4">
-          <Avatar className="h-8 w-8 sm:h-10 sm:w-10 border-2 border-black rounded-none flex-shrink-0">
-            <AvatarImage src={comment.profiles?.avatar_url ?? ""} />
-            <AvatarFallback className="bg-neutral-200 rounded-none font-display font-black text-xs">
-              {(comment.profiles?.display_name || comment.profiles?.username || "U").slice(0, 2).toUpperCase()}
-            </AvatarFallback>
-          </Avatar>
+          <Link href={`/profile/${comment.profiles?.username}`}>
+            <Avatar className="h-8 w-8 sm:h-10 sm:w-10 border-2 border-black rounded-none flex-shrink-0 hover:opacity-80 transition-opacity">
+              <AvatarImage src={comment.profiles?.avatar_url ?? ""} />
+              <AvatarFallback className="bg-neutral-200 rounded-none font-display font-black text-xs">
+                {(comment.profiles?.display_name || comment.profiles?.username || "U").slice(0, 2).toUpperCase()}
+              </AvatarFallback>
+            </Avatar>
+          </Link>
           
           <div className="space-y-1 w-full min-w-0">
             <div className="flex flex-wrap gap-2 justify-between items-center w-full">
-              <p className="font-display font-black text-xs uppercase tracking-wider text-black truncate">
-                {comment.profiles?.display_name || comment.profiles?.username}
-              </p>
+              <Link href={`/profile/${comment.profiles?.username}`} className="hover:underline">
+                <p className="font-display font-black text-xs uppercase tracking-wider text-black truncate">
+                  {comment.profiles?.display_name || comment.profiles?.username}
+                </p>
+              </Link>
               <p className="font-mono text-[9px] text-neutral-500 font-bold uppercase flex-shrink-0">
-                {new Date(comment.created_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
+                {new Date(comment.created_at).toLocaleDateString('vi-VN', { month: 'short', day: 'numeric' })}
               </p>
             </div>
             <p className="font-sans text-sm text-neutral-800 leading-relaxed pt-1 whitespace-pre-wrap break-words">
