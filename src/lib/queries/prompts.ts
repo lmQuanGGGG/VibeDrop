@@ -1,7 +1,7 @@
 import "server-only";
 
 import { TRENDING_WEIGHTS } from "@/lib/constants";
-import { createServerSupabaseClient } from "@/lib/supabase/server";
+import { createServerSupabaseClient, getCachedAuthUser } from "@/lib/supabase/server";
 
 export type PromptProfile = {
   id: string;
@@ -107,8 +107,8 @@ function normalizePrompt(row: PromptRow): PromptRecord {
 
 export async function getPublicFeed({ query, page = 1, limit = 20 }: { query?: string, page?: number, limit?: number } = {}) {
   const supabase = await createServerSupabaseClient();
-  const { data: auth } = await supabase.auth.getUser();
-  const viewerId = auth.user?.id;
+  const { user } = await getCachedAuthUser();
+  const viewerId = user?.id;
 
   const from = (page - 1) * limit;
   const to = from + limit - 1;
@@ -145,8 +145,8 @@ export async function getPublicFeed({ query, page = 1, limit = 20 }: { query?: s
 
 export async function getPromptById(promptId: string) {
   const supabase = await createServerSupabaseClient();
-  const { data: auth } = await supabase.auth.getUser();
-  const viewerId = auth.user?.id;
+  const { user } = await getCachedAuthUser();
+  const viewerId = user?.id;
 
   const { data, error } = await supabase
     .from("prompts")
@@ -174,8 +174,8 @@ export async function getPromptById(promptId: string) {
 
 export async function getPromptsByTag(tag: string) {
   const supabase = await createServerSupabaseClient();
-  const { data: auth } = await supabase.auth.getUser();
-  const viewerId = auth.user?.id;
+  const { user } = await getCachedAuthUser();
+  const viewerId = user?.id;
 
   const { data, error } = await supabase
     .from("prompts")
@@ -216,8 +216,8 @@ export async function getTrendingPrompts(page = 1, limit = 20) {
 
 export async function getSavedPrompts() {
   const supabase = await createServerSupabaseClient();
-  const { data: auth } = await supabase.auth.getUser();
-  const viewerId = auth.user?.id;
+  const { user } = await getCachedAuthUser();
+  const viewerId = user?.id;
 
   if (!viewerId) {
     return [] as PromptWithStats[];
@@ -245,8 +245,8 @@ export async function getSavedPrompts() {
 
 export async function getPromptsByUserId(userId: string) {
   const supabase = await createServerSupabaseClient();
-  const { data: auth } = await supabase.auth.getUser();
-  const viewerId = auth.user?.id;
+  const { user } = await getCachedAuthUser();
+  const viewerId = user?.id;
 
   const { data, error } = await supabase
     .from("prompts")
@@ -267,8 +267,8 @@ export async function getPromptsByUserId(userId: string) {
 
 export async function getPromptsByCategory(category: string, limit = 6) {
   const supabase = await createServerSupabaseClient();
-  const { data: auth } = await supabase.auth.getUser();
-  const viewerId = auth.user?.id;
+  const { user } = await getCachedAuthUser();
+  const viewerId = user?.id;
 
   const { data, error } = await supabase
     .from("prompts")

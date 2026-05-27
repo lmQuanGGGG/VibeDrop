@@ -1,6 +1,7 @@
 import { cookies } from "next/headers";
 import { createServerClient } from "@supabase/ssr";
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { cache } from "react";
 
 export async function createServerSupabaseClient(): Promise<SupabaseClient> {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -28,3 +29,23 @@ export async function createServerSupabaseClient(): Promise<SupabaseClient> {
     },
   });
 }
+
+export const getCachedAuthUser = cache(async () => {
+  const supabase = await createServerSupabaseClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return { user: null, profile: null };
+  }
+
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("id, username, display_name, avatar_url")
+    .eq("id", user.id)
+    .single();
+
+  return { user, profile };
+});
+

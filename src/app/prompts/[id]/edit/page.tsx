@@ -3,7 +3,7 @@ import { AppShell } from "@/components/app-shell";
 import { PromptEditor } from "@/components/prompt-editor";
 import { getPromptById } from "@/lib/queries/prompts";
 import { updatePrompt, deletePrompt } from "@/app/create/actions";
-import { createServerSupabaseClient } from "@/lib/supabase/server";
+import { getCachedAuthUser } from "@/lib/supabase/server";
 
 export default async function EditPromptPage({
   params,
@@ -12,10 +12,9 @@ export default async function EditPromptPage({
 }) {
   const { id } = await params;
   
-  const supabase = await createServerSupabaseClient();
-  const { data: auth } = await supabase.auth.getUser();
+  const { user } = await getCachedAuthUser();
 
-  if (!auth.user) {
+  if (!user) {
     redirect("/login");
   }
 
@@ -26,7 +25,7 @@ export default async function EditPromptPage({
   }
 
   // Double check ownership
-  if (prompt.user_id !== auth.user.id) {
+  if (prompt.user_id !== user.id) {
     redirect("/");
   }
 

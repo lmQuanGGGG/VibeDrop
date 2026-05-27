@@ -4,7 +4,7 @@ import { ProfileFeed } from "@/components/profile-feed";
 import { getPromptsByUserId } from "@/lib/queries/prompts";
 import { getProfileByUsername } from "@/lib/queries/profile";
 import { MapPin, Link as LinkIcon, Calendar, Pencil } from "lucide-react";
-import { createServerSupabaseClient } from "@/lib/supabase/server";
+import { getCachedAuthUser } from "@/lib/supabase/server";
 
 export default async function ProfilePage({
   params,
@@ -18,8 +18,7 @@ export default async function ProfilePage({
     notFound();
   }
 
-  const supabase = await createServerSupabaseClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const { user } = await getCachedAuthUser();
   const isOwner = user?.id === profile.id;
 
   const prompts = await getPromptsByUserId(profile.id);

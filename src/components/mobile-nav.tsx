@@ -7,26 +7,15 @@ import {
   TrendingUp,
   User,
 } from "lucide-react";
-import { createServerSupabaseClient } from "@/lib/supabase/server";
+import { getCachedAuthUser } from "@/lib/supabase/server";
 
 export async function MobileNav() {
-  const supabase = await createServerSupabaseClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const { user, profile } = await getCachedAuthUser();
 
   let profileHref = "/login";
 
-  if (user) {
-    const { data: profile } = await supabase
-      .from("profiles")
-      .select("username")
-      .eq("id", user.id)
-      .single();
-
-    if (profile) {
-      profileHref = `/profile/${profile.username}`;
-    }
+  if (user && profile) {
+    profileHref = `/profile/${profile.username}`;
   }
 
   const navItems = [

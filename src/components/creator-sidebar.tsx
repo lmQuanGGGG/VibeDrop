@@ -8,29 +8,17 @@ import {
   User,
   Search
 } from "lucide-react";
-import { createServerSupabaseClient } from "@/lib/supabase/server";
+import { getCachedAuthUser } from "@/lib/supabase/server";
 
 export async function CreatorSidebar() {
-  const supabase = await createServerSupabaseClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const { user, profile } = await getCachedAuthUser();
 
   let profileHref = "/login";
   let profileLabel = "Profile (Log in)";
 
-  if (user) {
-    // Lấy username từ bảng profiles
-    const { data: profile } = await supabase
-      .from("profiles")
-      .select("username")
-      .eq("id", user.id)
-      .single();
-
-    if (profile) {
-      profileHref = `/profile/${profile.username}`;
-      profileLabel = "My Profile";
-    }
+  if (user && profile) {
+    profileHref = `/profile/${profile.username}`;
+    profileLabel = "My Profile";
   }
 
   const navItems = [

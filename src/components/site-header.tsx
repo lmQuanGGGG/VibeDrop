@@ -1,22 +1,10 @@
 import Link from "next/link";
-import { createServerSupabaseClient } from "@/lib/supabase/server";
+import { getCachedAuthUser } from "@/lib/supabase/server";
 import { Search } from "lucide-react";
 import { LogoutButton } from "@/components/logout-button";
 
 export async function SiteHeader() {
-  const supabase = await createServerSupabaseClient();
-  const { data: auth } = await supabase.auth.getUser();
-  const user = auth.user;
-
-  const profile = user
-    ? (
-        await supabase
-          .from("profiles")
-          .select("username, display_name, avatar_url")
-          .eq("id", user.id)
-          .single()
-      ).data
-    : null;
+  const { user, profile } = await getCachedAuthUser();
 
   const displayName = profile?.display_name || profile?.username || "You";
 
