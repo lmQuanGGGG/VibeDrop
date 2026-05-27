@@ -67,6 +67,27 @@ export default async function ExplorePage({ searchParams }: ExplorePageProps) {
     >
       <div className="flex flex-col gap-12 pb-10 overflow-hidden">
         
+        {/* Billboard Header Banner */}
+        <section className="bg-[#ffd369] border-4 border-black p-5 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-0.5 transition-all flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 rounded-none">
+          <div className="flex flex-col gap-1.5">
+            <span className="font-mono text-[9px] font-black uppercase bg-black text-white px-2 py-0.5 w-max">
+              Live Competition
+            </span>
+            <h3 className="font-display font-black text-lg uppercase tracking-tight text-black">
+              The Trending Billboard is Live!
+            </h3>
+            <p className="font-sans text-xs text-neutral-800 font-bold leading-relaxed">
+              Check out the top 30 live ranked prompts fighting for the #1 crown spot.
+            </p>
+          </div>
+          <Link
+            href="/trending"
+            className="w-full sm:w-auto text-center bg-white hover:bg-neutral-100 border-2 border-black py-2.5 px-5 font-mono text-[10px] font-black uppercase shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-y-px active:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] transition-all cursor-pointer"
+          >
+            View Live Chart 🏆
+          </Link>
+        </section>
+
         {/* Categories Grid (Auto Scroll Marquee) */}
         <section>
           <h2 className="font-display font-black text-xl uppercase tracking-wider mb-4 border-b-2 border-black pb-2">

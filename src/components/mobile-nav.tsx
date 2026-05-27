@@ -31,7 +31,7 @@ export async function MobileNav() {
 
   const navItems = [
     { href: "/", label: "Home", icon: Home },
-    { href: "/trending", label: "Trend", icon: TrendingUp },
+    { href: "/explore", label: "Explore", icon: Compass },
     { href: "/create", label: "Drop", icon: PlusCircle, isMain: true },
     { href: "/saved", label: "Saved", icon: Bookmark },
     { href: profileHref, label: "Profile", icon: User },
@@ -54,7 +54,7 @@ export async function MobileNav() {
           }
 
           // Leave a gap for the center button
-          const isSecondItem = item.href === "/trending";
+          const isSecondItem = item.href === "/explore";
           const isFourthItem = item.href === "/saved";
           const extraClasses = isSecondItem ? "mr-4" : isFourthItem ? "ml-4" : "";
 
