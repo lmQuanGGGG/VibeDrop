@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { useRouter } from "next/navigation";
 import { Flag } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -11,6 +12,7 @@ type ReportButtonProps = {
 export function ReportButton({ promptId }: ReportButtonProps) {
   const [sent, setSent] = useState(false);
   const [isPending, startTransition] = useTransition();
+  const router = useRouter();
 
   const onReport = () => {
     startTransition(async () => {
@@ -21,7 +23,7 @@ export function ReportButton({ promptId }: ReportButtonProps) {
       });
 
       if (response.status === 401) {
-        window.location.href = "/login";
+        router.push("/login");
         return;
       }
 

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { useRouter } from "next/navigation";
 import { ArrowBigDown, ArrowBigUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -18,6 +19,7 @@ export function VoteButton({
   const [score, setScore] = useState(initialScore);
   const [value, setValue] = useState(initialValue ?? 0);
   const [isPending, startTransition] = useTransition();
+  const router = useRouter();
 
   const submitVote = (nextValue: number) => {
     const resolved = value === nextValue ? 0 : nextValue;
@@ -30,7 +32,7 @@ export function VoteButton({
       });
 
       if (response.status === 401) {
-        window.location.href = "/login";
+        router.push("/login");
         return;
       }
 

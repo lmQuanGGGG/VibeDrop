@@ -3,6 +3,7 @@ import { CreatorSidebar } from "@/components/creator-sidebar";
 import { RightSidebar } from "@/components/right-sidebar";
 import { SiteHeader } from "@/components/site-header";
 import { MobileNav } from "@/components/mobile-nav";
+import { MobileNavWrapper } from "@/components/mobile-nav-wrapper";
 
 type AppShellProps = {
   title?: string;
@@ -48,8 +49,12 @@ export function AppShell({
       {/* Right Side widget sidebar */}
       <RightSidebar className="w-80 max-xl:hidden fixed right-0 top-0 bottom-0 p-6 pt-20 border-l-2 border-black bg-[#fbfcfa]" />
       
-      {/* Mobile Bottom Navigation */}
-      {showSidebar && <MobileNav />}
+      {/* Mobile Bottom Navigation — auto-hides on scroll up, shows on scroll down */}
+      {showSidebar && (
+        <MobileNavWrapper>
+          <MobileNav />
+        </MobileNavWrapper>
+      )}
     </div>
   );
 }

@@ -38,7 +38,7 @@ export async function MobileNav() {
   ];
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 lg:hidden border-t-2 border-black bg-white z-50 px-2 pb-safe pt-2 shadow-[0_-4px_0px_0px_rgba(0,0,0,1)]">
+    <nav className="border-t-2 border-black bg-white px-2 pb-safe pt-2 shadow-[0_-4px_0px_0px_rgba(0,0,0,1)]" style={{ touchAction: 'manipulation' }}>
       <div className="flex items-center justify-around h-16 max-w-md mx-auto relative">
         {navItems.map((item) => {
           if (item.isMain) {

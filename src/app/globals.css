@@ -132,6 +132,11 @@
   }
 }
 
+/* Eliminate 300ms tap delay on all interactive elements */
+a, button, [role="button"], input, label, select, textarea {
+  touch-action: manipulation;
+}
+
 body::before {
   content: none;
 }
@@ -272,4 +277,11 @@ body::after {
 
 .animate-marquee-slow {
   animation: marquee 40s linear infinite;
+}
+
+/* Loading bar for page transitions */
+@keyframes loading-bar {
+  0% { width: 0%; margin-left: 0%; }
+  50% { width: 60%; margin-left: 20%; }
+  100% { width: 0%; margin-left: 100%; }
 }

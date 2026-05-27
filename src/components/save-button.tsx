@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { useRouter } from "next/navigation";
 import { Bookmark } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -12,6 +13,7 @@ type SaveButtonProps = {
 export function SaveButton({ promptId, initialSaved }: SaveButtonProps) {
   const [saved, setSaved] = useState(initialSaved);
   const [isPending, startTransition] = useTransition();
+  const router = useRouter();
 
   const toggleSave = () => {
     startTransition(async () => {
@@ -20,7 +22,7 @@ export function SaveButton({ promptId, initialSaved }: SaveButtonProps) {
       });
 
       if (response.status === 401) {
-        window.location.href = "/login";
+        router.push("/login");
         return;
       }
 
