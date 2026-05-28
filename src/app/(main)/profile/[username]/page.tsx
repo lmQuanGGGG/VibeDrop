@@ -4,6 +4,47 @@ import { getPromptsByUserId } from "@/lib/queries/prompts";
 import { getProfileByUsername } from "@/lib/queries/profile";
 import { MapPin, Link as LinkIcon, Calendar, Pencil } from "lucide-react";
 import { getCachedAuthUser } from "@/lib/supabase/server";
+import type { Metadata } from "next";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ username: string }>;
+}): Promise<Metadata> {
+  const { username } = await params;
+  const profile = await getProfileByUsername(username);
+
+  if (!profile) {
+    return {};
+  }
+
+  const displayName = profile.display_name || profile.username;
+  const title = `@${profile.username} (${displayName}) - Creator Profile`;
+  const description = profile.bio || `Explore prompt libraries, remix ideas, and view creative works by @${profile.username} on VibeDrop.`;
+  const images = profile.avatar_url ? [profile.avatar_url] : [];
+
+  return {
+    title,
+    description,
+    alternates: {
+      canonical: `/profile/${profile.username}`,
+    },
+    openGraph: {
+      title,
+      description,
+      images,
+      type: "profile",
+      username: profile.username,
+    },
+    twitter: {
+      card: "summary",
+      title,
+      description,
+      images,
+    },
+  };
+}
+
 
 export default async function ProfilePage({
   params,
@@ -30,8 +71,40 @@ export default async function ProfilePage({
     .replace(/Đ/g, "D");
   const totalVotes = prompts.reduce((acc, p) => acc + p.voteScore, 0);
 
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "ProfilePage",
+    "mainEntity": {
+      "@type": "Person",
+      "name": displayName,
+      "alternateName": profile.username,
+      "image": profile.avatar_url || undefined,
+      "description": profile.bio || undefined,
+      "identifier": profile.id,
+      "url": `${process.env.NEXT_PUBLIC_APP_URL || "https://vibedrop.com"}/profile/${profile.username}`,
+    },
+    "interactionStatistic": [
+      {
+        "@type": "InteractionCounter",
+        "interactionType": "https://schema.org/WriteAction",
+        "userInteractionCount": prompts.length,
+      },
+      {
+        "@type": "InteractionCounter",
+        "interactionType": "https://schema.org/LikeAction",
+        "userInteractionCount": totalVotes,
+      }
+    ]
+  };
+
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c"),
+        }}
+      />
       {/* Massive Hero Header */}
       <div className="relative mb-12">
         {/* Abstract Cover Background */}

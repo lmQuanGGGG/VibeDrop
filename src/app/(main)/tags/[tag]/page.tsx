@@ -1,5 +1,26 @@
 import { PromptFeed } from "@/components/prompt-feed";
 import { getPromptsByTag } from "@/lib/queries/prompts";
+import type { Metadata } from "next";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ tag: string }>;
+}): Promise<Metadata> {
+  const { tag } = await params;
+  const decodedTag = decodeURIComponent(tag);
+  const title = `Prompts tagged with #${decodedTag}`;
+  const description = `Discover and copy AI prompts tagged with #${decodedTag} on VibeDrop. Browse top collections.`;
+
+  return {
+    title,
+    description,
+    alternates: {
+      canonical: `/tags/${tag}`,
+    },
+  };
+}
+
 
 export default async function TagPage({
   params,

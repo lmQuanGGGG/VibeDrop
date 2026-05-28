@@ -30,4 +30,3 @@ npm run dev
 - `npm run start` - start production server
 - `npm run lint` - run lint checks
 # VibeDrop
-ok

@@ -1,5 +1,16 @@
 import { PromptArchiveList } from "@/components/prompt-archive-list";
 import { getSavedPrompts } from "@/lib/queries/prompts";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Saved Prompts",
+  description: "View your personal gallery of saved AI prompts. Organize and use your favorite creations.",
+  robots: {
+    index: false,
+    follow: false,
+  },
+};
+
 
 export default async function SavedPage() {
   const prompts = await getSavedPrompts();

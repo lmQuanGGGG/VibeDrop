@@ -10,6 +10,49 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { getPromptComments } from "@/lib/queries/comments";
 import { getPromptById } from "@/lib/queries/prompts";
+import type { Metadata } from "next";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}): Promise<Metadata> {
+  const { id } = await params;
+  const prompt = await getPromptById(id);
+
+  if (!prompt) {
+    return {};
+  }
+
+  const title = prompt.title;
+  const description = `${prompt.category.toUpperCase()} Prompt: ${prompt.prompt_text.slice(0, 140)}...`;
+  const images = prompt.image_url ? [prompt.image_url] : [];
+
+  return {
+    title,
+    description,
+    alternates: {
+      canonical: `/prompts/${prompt.id}`,
+    },
+    openGraph: {
+      title,
+      description,
+      images,
+      type: "article",
+      publishedTime: prompt.created_at,
+      modifiedTime: prompt.updated_at,
+      authors: prompt.profiles?.username ? [`/profile/${prompt.profiles.username}`] : [],
+      tags: prompt.tags,
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images,
+    },
+  };
+}
+
 
 export default async function PromptDetailPage({
   params,
@@ -25,8 +68,36 @@ export default async function PromptDetailPage({
 
   const comments = await getPromptComments(prompt.id);
 
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "CreativeWork",
+    "name": prompt.title,
+    "description": `${prompt.category.toUpperCase()} Prompt: ${prompt.prompt_text.slice(0, 150)}...`,
+    "text": prompt.prompt_text,
+    "author": prompt.profiles ? {
+      "@type": "Person",
+      "name": prompt.profiles.display_name || prompt.profiles.username,
+      "url": `${process.env.NEXT_PUBLIC_APP_URL || "https://vibedrop.com"}/profile/${prompt.profiles.username}`,
+    } : undefined,
+    "dateCreated": prompt.created_at,
+    "dateModified": prompt.updated_at,
+    "keywords": prompt.tags?.join(", "),
+    "image": prompt.image_url || undefined,
+    "interactionStatistic": {
+      "@type": "InteractionCounter",
+      "interactionType": "https://schema.org/CopyAction",
+      "userInteractionCount": prompt.copy_count,
+    },
+  };
+
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c"),
+        }}
+      />
       <div className="space-y-2 mb-6">
         <h1 className="text-3xl font-display font-black uppercase tracking-wide">{prompt.title}</h1>
         <p className="text-sm font-sans text-neutral-600">Category: {prompt.category}</p>

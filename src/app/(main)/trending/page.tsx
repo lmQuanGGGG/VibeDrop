@@ -1,5 +1,15 @@
 import { TrendingFeed } from "@/components/trending-feed";
 import { getTrendingPrompts } from "@/lib/queries/prompts";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Trending Billboard",
+  description: "Check out the top 30 live ranked AI prompts on VibeDrop. Remix the best prompts, vote for your favorites, and climb the leaderboard.",
+  alternates: {
+    canonical: "/trending",
+  },
+};
+
 
 export default async function TrendingPage() {
   // Always fetch just the top 30 for the billboard chart

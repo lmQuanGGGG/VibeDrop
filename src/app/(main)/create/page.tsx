@@ -1,5 +1,15 @@
 import { CreatePromptForm } from "@/components/create-prompt-form";
 import { getPromptById } from "@/lib/queries/prompts";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Create Prompt",
+  description: "Share your best AI prompts with the community. Let others copy and remix them, and see your creation rise to the trending feed.",
+  robots: {
+    index: false,
+  },
+};
+
 
 type CreatePageProps = {
   searchParams?: Promise<{ remix?: string }>;

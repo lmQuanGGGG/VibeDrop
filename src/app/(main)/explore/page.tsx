@@ -4,6 +4,16 @@ import { Compass, Palette, Camera, Code2, PenTool, Sparkles, Search } from "luci
 import { PromptRow } from "@/components/prompt-row";
 import { PromptFeed } from "@/components/prompt-feed";
 import { Marquee } from "@/components/marquee";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Explore",
+  description: "Browse AI prompts by categories, search for top creations, and find coding or photography ideas on VibeDrop.",
+  alternates: {
+    canonical: "/explore",
+  },
+};
+
 
 const CATEGORIES = [
   { name: "ChatGPT", icon: Sparkles, color: "bg-[#c8f560]" },
@@ -32,10 +42,10 @@ export default async function ExplorePage({ searchParams }: ExplorePageProps) {
           <p className="text-sm font-sans text-neutral-600">Results for "{query}"</p>
         </div>
         <div className="mb-8 mt-2 border-b-4 border-black pb-4">
-          <h1 className="font-display font-black text-3xl uppercase tracking-wide flex items-center gap-3">
+          <h2 className="font-display font-black text-3xl uppercase tracking-wide flex items-center gap-3">
             <Search className="w-8 h-8" strokeWidth={3} />
             Search Results
-          </h1>
+          </h2>
           <p className="font-mono text-sm font-bold mt-2">
             Showing prompts matching <span className="bg-[#b5ffa2] border border-black px-1">"{query}"</span>
           </p>

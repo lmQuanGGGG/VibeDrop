@@ -15,3 +15,6 @@ export const TRENDING_WEIGHTS = {
   views: 0.2,
   ageHours: -0.5,
 } as const;
+
+export const SITE_URL = process.env.NEXT_PUBLIC_APP_URL || "https://vibedrop.com";
+
