@@ -5,6 +5,7 @@ import { getProfileByUsername } from "@/lib/queries/profile";
 import { MapPin, Link as LinkIcon, Calendar, Pencil } from "lucide-react";
 import { getCachedAuthUser } from "@/lib/supabase/server";
 import type { Metadata } from "next";
+import { EditProfileDialog } from "@/components/edit-profile-dialog";
 
 export async function generateMetadata({
   params,
@@ -128,8 +129,11 @@ export default async function ProfilePage({
               <h1 className="font-display font-black text-5xl sm:text-6xl uppercase tracking-tight text-black drop-shadow-[2px_2px_0px_rgba(255,255,255,1)]">
                 {displayNameNoAccent}
               </h1>
-              <div className="font-mono text-lg font-bold bg-black text-white inline-block px-3 py-1 mt-2">
-                @{profile.username}
+              <div className="flex flex-wrap items-center gap-2 mt-2">
+                <div className="font-mono text-lg font-bold bg-black text-white inline-block px-3 py-1">
+                  @{profile.username}
+                </div>
+                {isOwner && <EditProfileDialog profile={profile} />}
               </div>
             </div>
 
