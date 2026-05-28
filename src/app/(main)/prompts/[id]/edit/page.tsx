@@ -1,7 +1,7 @@
 import { notFound, redirect } from "next/navigation";
-import { PromptEditor } from "@/components/prompt-editor";
+import { EditPromptForm } from "@/components/edit-prompt-form";
 import { getPromptById } from "@/lib/queries/prompts";
-import { updatePrompt, deletePrompt } from "@/app/(main)/create/actions";
+import { deletePrompt } from "@/app/(main)/create/actions";
 import { getCachedAuthUser } from "@/lib/supabase/server";
 
 export default async function EditPromptPage({
@@ -28,7 +28,6 @@ export default async function EditPromptPage({
     redirect("/");
   }
 
-  const updateAction = updatePrompt.bind(null, prompt.id);
   const deleteAction = deletePrompt.bind(null, prompt.id);
 
   return (
@@ -38,29 +37,15 @@ export default async function EditPromptPage({
         <p className="text-sm font-sans text-neutral-600">Refine your vibe and update your parameters.</p>
       </div>
       <div className="space-y-6">
-        <form
-          action={updateAction}
-          className="bg-[#c8f560] border-4 border-black p-8 max-sm:p-6 shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] rounded-none space-y-6"
-        >
-          <PromptEditor 
-            defaultTitle={prompt.title}
-            defaultPrompt={prompt.prompt_text}
-            defaultResult={prompt.result_text ?? undefined}
-            defaultCategory={prompt.category}
-            defaultTags={prompt.tags?.join(", ")}
-          />
-          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 pt-4 border-t-2 border-black mt-6">
-            <button 
-              type="submit" 
-              className="w-full sm:w-auto py-3 px-6 bg-black text-white font-display font-black uppercase tracking-wider text-sm border-2 border-black hover:bg-neutral-800 transition-all shadow-[4px_4px_0px_0px_rgba(0,0,0,0.15)] active:translate-y-1 active:shadow-[0px_0px_0px_0px_rgba(0,0,0,1)] cursor-pointer"
-            >
-              Save Changes
-            </button>
-            <p className="font-mono text-[10px] text-neutral-700 uppercase font-bold max-w-xs">
-              Your prompt will be updated instantly on the feed.
-            </p>
-          </div>
-        </form>
+        <EditPromptForm 
+          promptId={prompt.id}
+          defaultTitle={prompt.title}
+          defaultPrompt={prompt.prompt_text}
+          defaultResult={prompt.result_text ?? undefined}
+          defaultCategory={prompt.category}
+          defaultTags={prompt.tags?.join(", ")}
+          remixOf={prompt.remix_of}
+        />
 
         <form 
           action={deleteAction}
