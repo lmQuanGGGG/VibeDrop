@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { AppShell } from "@/components/app-shell";
 import { getTrendingPrompts, getPopularTags, getPromptsByCategory, getPublicFeed } from "@/lib/queries/prompts";
 import { Compass, Palette, Camera, Code2, PenTool, Sparkles, Search } from "lucide-react";
 import { PromptRow } from "@/components/prompt-row";
@@ -27,7 +26,11 @@ export default async function ExplorePage({ searchParams }: ExplorePageProps) {
   if (query) {
     const { prompts: searchResults } = await getPublicFeed({ query });
     return (
-      <AppShell title="Search" description={`Results for "${query}"`}>
+      <>
+        <div className="space-y-2 mb-6">
+          <h1 className="text-3xl font-display font-black uppercase tracking-wide">Search</h1>
+          <p className="text-sm font-sans text-neutral-600">Results for "{query}"</p>
+        </div>
         <div className="mb-8 mt-2 border-b-4 border-black pb-4">
           <h1 className="font-display font-black text-3xl uppercase tracking-wide flex items-center gap-3">
             <Search className="w-8 h-8" strokeWidth={3} />
@@ -41,7 +44,7 @@ export default async function ExplorePage({ searchParams }: ExplorePageProps) {
           prompts={searchResults}
           emptyMessage={`No prompts found for "${query}". Try another search term.`}
         />
-      </AppShell>
+      </>
     );
   }
 
@@ -61,10 +64,12 @@ export default async function ExplorePage({ searchParams }: ExplorePageProps) {
   ]);
 
   return (
-    <AppShell
-      title="Explore"
-      description="Discover new categories, trending vibes, and top creators."
-    >
+    <>
+      <div className="space-y-2 mb-6">
+        <h1 className="text-3xl font-display font-black uppercase tracking-wide">Explore</h1>
+        <p className="text-sm font-sans text-neutral-600">Discover new categories, trending vibes, and top creators.</p>
+      </div>
+
       <div className="flex flex-col gap-12 pb-10 overflow-hidden">
         
         {/* Billboard Header Banner */}
@@ -159,6 +164,6 @@ export default async function ExplorePage({ searchParams }: ExplorePageProps) {
         </section>
 
       </div>
-    </AppShell>
+    </>
   );
 }

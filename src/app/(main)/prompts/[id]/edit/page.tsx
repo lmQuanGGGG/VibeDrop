@@ -1,8 +1,7 @@
 import { notFound, redirect } from "next/navigation";
-import { AppShell } from "@/components/app-shell";
 import { PromptEditor } from "@/components/prompt-editor";
 import { getPromptById } from "@/lib/queries/prompts";
-import { updatePrompt, deletePrompt } from "@/app/create/actions";
+import { updatePrompt, deletePrompt } from "@/app/(main)/create/actions";
 import { getCachedAuthUser } from "@/lib/supabase/server";
 
 export default async function EditPromptPage({
@@ -33,10 +32,11 @@ export default async function EditPromptPage({
   const deleteAction = deletePrompt.bind(null, prompt.id);
 
   return (
-    <AppShell
-      title="Edit Prompt"
-      description="Refine your vibe and update your parameters."
-    >
+    <>
+      <div className="space-y-2 mb-6">
+        <h1 className="text-3xl font-display font-black uppercase tracking-wide">Edit Prompt</h1>
+        <p className="text-sm font-sans text-neutral-600">Refine your vibe and update your parameters.</p>
+      </div>
       <div className="space-y-6">
         <form
           action={updateAction}
@@ -78,6 +78,6 @@ export default async function EditPromptPage({
           </button>
         </form>
       </div>
-    </AppShell>
+    </>
   );
 }

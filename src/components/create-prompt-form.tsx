@@ -4,7 +4,7 @@ import { useState } from "react";
 import { PromptEditor } from "@/components/prompt-editor";
 import { SubmitButton } from "@/components/submit-button";
 import { uploadImageToR2 } from "@/lib/upload-r2";
-import { createPrompt } from "@/app/create/actions";
+import { createPrompt } from "@/app/(main)/create/actions";
 
 type CreatePromptFormProps = {
   remixOf: string | null;

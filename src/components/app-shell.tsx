@@ -6,15 +6,11 @@ import { MobileNav } from "@/components/mobile-nav";
 import { MobileNavWrapper } from "@/components/mobile-nav-wrapper";
 
 type AppShellProps = {
-  title?: string;
-  description?: string;
   children: ReactNode;
   showSidebar?: boolean;
 };
 
 export function AppShell({
-  title,
-  description,
   children,
   showSidebar = true,
 }: AppShellProps) {
@@ -29,14 +25,6 @@ export function AppShell({
         
         {/* Page contents panel */}
         <main className="p-8 max-sm:p-4 pb-28 max-sm:pb-28 lg:pb-8 flex-grow" id="view-router-switch">
-          {title ? (
-            <div className="space-y-2 mb-6">
-              <h1 className="text-3xl font-display font-black uppercase tracking-wide">{title}</h1>
-              {description ? (
-                <p className="text-sm font-sans text-neutral-600">{description}</p>
-              ) : null}
-            </div>
-          ) : null}
           {children}
           
           {/* Mobile Right Sidebar Content */}

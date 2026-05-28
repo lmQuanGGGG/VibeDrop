@@ -1,5 +1,4 @@
 import { notFound } from "next/navigation";
-import { AppShell } from "@/components/app-shell";
 import { ProfileFeed } from "@/components/profile-feed";
 import { getPromptsByUserId } from "@/lib/queries/prompts";
 import { getProfileByUsername } from "@/lib/queries/profile";
@@ -32,7 +31,7 @@ export default async function ProfilePage({
   const totalVotes = prompts.reduce((acc, p) => acc + p.voteScore, 0);
 
   return (
-    <AppShell>
+    <>
       {/* Massive Hero Header */}
       <div className="relative mb-12">
         {/* Abstract Cover Background */}
@@ -95,6 +94,6 @@ export default async function ProfilePage({
           emptyMessage="No prompts yet from this creator."
         />
       </div>
-    </AppShell>
+    </>
   );
 }

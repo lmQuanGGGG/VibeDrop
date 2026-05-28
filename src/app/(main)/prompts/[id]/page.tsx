@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { AppShell } from "@/components/app-shell";
 import { CommentSection } from "@/components/comment-section";
 import { CopyButton } from "@/components/copy-button";
 import { PromptViewTracker } from "@/components/prompt-view-tracker";
@@ -27,10 +26,12 @@ export default async function PromptDetailPage({
   const comments = await getPromptComments(prompt.id);
 
   return (
-    <AppShell
-      title={prompt.title}
-      description={`Category: ${prompt.category}`}
-    >
+    <>
+      <div className="space-y-2 mb-6">
+        <h1 className="text-3xl font-display font-black uppercase tracking-wide">{prompt.title}</h1>
+        <p className="text-sm font-sans text-neutral-600">Category: {prompt.category}</p>
+      </div>
+
       <PromptViewTracker promptId={prompt.id} />
       
       <div className="bg-[#b5ffa2] border-4 border-black p-8 max-sm:p-6 shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] rounded-none mb-8 relative">
@@ -109,6 +110,6 @@ export default async function PromptDetailPage({
       </div>
 
       <CommentSection promptId={prompt.id} comments={comments} />
-    </AppShell>
+    </>
   );
 }

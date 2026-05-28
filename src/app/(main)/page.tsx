@@ -1,4 +1,3 @@
-import { AppShell } from "@/components/app-shell";
 import { StickyFeed } from "@/components/sticky-feed";
 import { getPublicFeed } from "@/lib/queries/prompts";
 import { Pagination } from "@/components/pagination";
@@ -13,7 +12,7 @@ export default async function Home(props: {
   const { prompts, totalPages } = await getPublicFeed({ page, limit });
 
   return (
-    <AppShell showSidebar>
+    <>
       {/* Hero Header Section */}
       <div className="grid gap-6 lg:grid-cols-12 mb-16 mt-2" id="feed-hero-header">
         {/* Main Hero Card */}
@@ -84,6 +83,6 @@ export default async function Home(props: {
           <Pagination currentPage={page} totalPages={totalPages} basePath="/" />
         </div>
       )}
-    </AppShell>
+    </>
   );
 }
